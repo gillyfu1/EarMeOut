@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EarMeOut — Static Preview</title>
+  <meta name="description" content="EarMeOut static preview: open directly without a server.">
+  <style>
+    :root {
+      --color-bg: #fafbf9;
+      --color-surface: #f5f7f5;
+      --color-elevated: #eef2f0;
+      --color-text: #1a2e26;
+      --color-muted: #6b8e7a;
+      --color-accent: #040404;
+      --color-accent-contrast: #ffffff;
+      --radius: 14px;
+      --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.25), 0 8px 10px -6px rgba(0,0,0,0.2);
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.25);
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color: var(--color-text);
+      background: #fafbf9;
+      line-height: 1.5;
+      text-align: center; /* center text site-wide */
+    }
+    .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,1px,1px); white-space: nowrap; border: 0; }
+    .container { width: min(1100px, 92%); margin: 0 auto; }
+    .section { padding: 64px 0; }
+    .section.alt { background: rgba(245,247,245,0.5); }
+    .site-header { position: sticky; top: 0; z-index: 20; background: rgba(250,251,249,0.95); backdrop-filter: saturate(140%) blur(12px); border-bottom: 1px solid rgba(107,142,122,0.15); }
+    .nav { display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; padding: 14px min(4vw, 22px); }
+    .brand { color: var(--color-text); font-weight: 800; text-decoration: none; letter-spacing: 0.2px; font-size: 1.9rem; }
+    .nav-toggle { display: none; background: transparent; color: var(--color-text); border: 1px solid rgba(107,142,122,0.3); padding: 8px 10px; border-radius: 8px; }
+    .nav-links { display: flex; list-style: none; gap: 18px; margin: 0; padding: 0; }
+    .nav a { color: var(--color-muted); text-decoration: none; }
+    .nav a:hover { color: var(--color-text); }
+    @media (max-width: 720px) {
+      .nav-toggle { display: inline-block; }
+      .nav-links { display: none; position: absolute; right: 12px; top: 56px; background: var(--color-elevated); padding: 12px; border-radius: 10px; box-shadow: var(--shadow-lg); }
+      .nav-links.open { display: block; }
+      .nav-links li { margin: 8px 2px; }
+    }
+    .hero { display: grid; grid-template-columns: 1fr 1fr; align-items: center; justify-items: center; gap: clamp(16px, 4vw, 36px); padding: clamp(36px, 7vw, 84px) 0; }
+    .hero-content { max-width: 640px; padding-inline: 16px; margin-left: 140px; }
+    .hero-content h1 { font-size: clamp(36px, 6.5vw, 64px); line-height: 1.05; margin: 0 0 12px; letter-spacing: -0.02em; text-align: center; }
+    .hero-content p { color: var(--color-muted); margin: 0 0 24px; font-size: 1.2rem; }
+    .hero-cta { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+    .hero-visual { display: grid; place-items: center; margin-top: -120px; }
+    .hero-visual .bot { width: min(420px, 42vw); max-width: 100%; height: auto; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.35)); }
+    .hero-blob { position: absolute; inset: 0; border-radius: 24px; background: radial-gradient(800px 400px at 75% 25%, rgba(90,157,122,0.2), transparent 60%),
+                 radial-gradient(600px 400px at 25% 75%, rgba(107,142,122,0.15), transparent 60%),
+                 linear-gradient(145deg, rgba(245,247,245,0.3), rgba(250,251,249,0.1));
+                 border: 1px solid rgba(107,142,122,0.15); box-shadow: var(--shadow-lg);
+    }
+    @media (max-width: 960px) { .hero { grid-template-columns: 1fr; } }
+    .button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 16px; border-radius: 999px; border: 1px solid transparent; cursor: pointer; transition: transform 0.05s ease, filter 0.15s ease, background 0.2s ease; text-decoration: none; font-weight: 600; }
+    .button:active { transform: translateY(1px); }
+    .button.primary { background: var(--color-accent); color: var(--color-accent-contrast); box-shadow: 0 8px 24px rgba(90,157,122,0.3); }
+    .button.secondary { background: transparent; color: var(--color-text); border-color: rgba(107,142,122,0.3); border: 1px solid rgba(107,142,122,0.3); }
+    .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 20px; }
+    .feature { background: var(--color-elevated); border: 1px solid rgba(107,142,122,0.2); border-radius: 16px; padding: 18px; box-shadow: var(--shadow-sm); }
+    .feature-icon { font-size: 22px; margin-bottom: 6px; }
+    .feature h3 { margin: 6px 0 8px; font-size: 1.05rem; }
+    .feature p { margin: 0; color: var(--color-muted); }
+    @media (max-width: 960px) { .features { grid-template-columns: 1fr; } .hero { grid-template-columns: 1fr; } }
+    .site-footer { padding: 28px 0 40px; background: rgba(250,251,249,0.9); border-top: 1px solid rgba(107,142,122,0.15); }
+    .footer-content { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding-bottom: 10px; text-align: left; }
+    .footer-links { display: flex; gap: 12px; }
+    .footer-bottom { color: var(--color-muted); text-align: left; }
+    .chatbot-launcher { position: fixed; right: 20px; bottom: 20px; width: 56px; height: 56px; border-radius: 50%; border: 1px solid rgba(107,142,122,0.3); background: var(--color-accent); color: var(--color-accent-contrast); box-shadow: var(--shadow-lg); cursor: pointer; font-size: 22px; display: grid; place-items: center; z-index: 50; }
+    .chatbot { position: fixed; right: 20px; bottom: 88px; width: min(360px, 92vw); max-height: min(70vh, 620px); display: flex; flex-direction: column; background: var(--color-surface); border: 1px solid rgba(107,142,122,0.3); border-radius: var(--radius); box-shadow: var(--shadow-lg); overflow: hidden; z-index: 50; }
+    .chatbot[hidden] { display: none; }
+    .chatbot-header { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 10px 12px; background: linear-gradient(180deg, rgba(245,247,245,0.6), transparent); border-bottom: 1px solid rgba(107,142,122,0.15); }
+    .chatbot-avatar img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(107,142,122,0.3); }
+    .chatbot-close { background: transparent; border: 1px solid rgba(107,142,122,0.3); color: var(--color-text); width: 30px; height: 30px; border-radius: 8px; cursor: pointer; }
+    .chatbot-messages { padding: 12px; overflow: auto; display: flex; flex-direction: column; gap: 8px; }
+    .message { display: grid; grid-template-columns: auto 1fr; gap: 8px; align-items: flex-start; }
+    .message .bubble { padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(107,142,122,0.3); background: var(--color-elevated); width: fit-content; max-width: 80%; }
+    .message.user { justify-content: end; grid-template-columns: 1fr auto; }
+    .message.user .bubble { background: rgba(90,157,122,0.2); border-color: rgba(90,157,122,0.4); justify-self: end; }
+    .message.assistant .bubble { background: rgba(245,247,245,0.7); }
+    .chatbot-input { display: grid; grid-template-columns: 1fr auto; gap: 8px; padding: 10px; border-top: 1px solid rgba(107,142,122,0.2); }
+    .chatbot-input input { width: 100%; background: #ffffff; color: var(--color-text); border: 1px solid rgba(107,142,122,0.2); border-radius: 999px; padding: 10px 12px; }
+    .chatbot-input input::placeholder { color: var(--color-muted); }
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-thumb { background-color: rgba(107,142,122,0.3); border-radius: 10px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="brand" href="#">EarMeOut</a>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+      <ul class="nav-links">
+        <li><a href="preview.html#home">Home</a></li>
+        <li><a href="preview.html#resources">Resources</a></li>
+        <li><a href="preview.html#chat">Chat</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="home" class="site-main">
+    <section class="hero">
+      <div class="hero-content">
+        <h1>Vent without judgement.</h1>
+        <p>Your mental health matters. Talk to someone who cares, 24/7.</p>
+        <div class="hero-cta">
+          <a class="button primary" href="#chat">Start Talking</a>
+          <a class="button secondary" href="#about">Learn More</a>
+        </div>
+      </div>
+      <div class="hero-visual" aria-hidden="false">
+        <img class="bot" alt="EarMeOut bot" src="static/bot.png">
+      </div>
+    </section>
+
+    <section id="about" class="section">
+      <div class="container">
+        <h2>About EarMeOut</h2>
+        <p>
+          EarMeOut is designed to help you express your thoughts safely and privately.
+          We provide a non-judgmental companion so you can reflect, decompress, and feel supported.
+        </p>
+        <div class="features">
+          <div class="feature">
+            <div class="feature-icon" aria-hidden="true">💬</div>
+            <h3>Always available</h3>
+            <p>Talk when you need to, day or night.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon" aria-hidden="true">🛡️</div>
+            <h3>Judgment-free</h3>
+            <p>Feel safe to share what’s on your mind.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon" aria-hidden="true">🎯</div>
+            <h3>Helpful prompts</h3>
+            <p>Gentle guidance to help you open up.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="resources" class="section alt">
+      <div class="container">
+        <h2>Resources</h2>
+        <ul class="resource-list">
+          <li>Grounding techniques and breathing exercises</li>
+          <li>Guided journaling prompts</li>
+          <li>Links to crisis and professional support</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer id="contact" class="site-footer">
+    <div class="container footer-content">
+      <div>
+        <strong>EarMeOut</strong>
+        <p>Because being heard matters.</p>
+      </div>
+      <div class="footer-links">
+        <a href="#resources">Resources</a>
+        <a href="#chat">Chat</a>
+        <a href="#home">Top</a>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <small>
+        This site is not a substitute for professional help. If you’re in crisis, please contact your local emergency number or a crisis hotline in your region.
+      </small>
+    </div>
+  </footer>
+
+  <button id="chatbot-launcher" class="chatbot-launcher" aria-controls="chatbot" aria-expanded="false" title="Open chat">
+    <span class="visually-hidden">Open chat</span>
+    💟
+  </button>
+
+  <section id="chat" class="chatbot" role="dialog" aria-labelledby="chatbot-title" aria-modal="false" hidden>
+    <div class="chatbot-header">
+      <div class="chatbot-avatar"></div>
+      <h2 id="chatbot-title">EarMeOut</h2>
+      <button class="chatbot-close" aria-label="Close chat">×</button>
+    </div>
+    <div class="chatbot-messages" aria-live="polite" aria-atomic="false"></div>
+    <form class="chatbot-input" autocomplete="off">
+      <label for="chat-input" class="visually-hidden">Message</label>
+      <input id="chat-input" name="message" type="text" placeholder="Type your message..." required>
+      <button type="submit" class="button primary">Send</button>
+    </form>
+  </section>
+
+  <script>
+  (function(){
+    const navToggle = document.querySelector('.nav-toggle');
+    const navLinks = document.querySelector('.nav-links');
+    if (navToggle && navLinks) {
+      navToggle.addEventListener('click', () => {
+        const open = navLinks.classList.toggle('open');
+        navToggle.setAttribute('aria-expanded', String(open));
+      });
+    }
+
+    const launcher = document.getElementById('chatbot-launcher');
+    const chat = document.querySelector('.chatbot');
+    const closeBtn = document.querySelector('.chatbot-close');
+    const form = document.querySelector('.chatbot-input');
+    const input = document.getElementById('chat-input');
+    const messages = document.querySelector('.chatbot-messages');
+
+    function openChat() {
+      if (!chat || !launcher) return;
+      chat.hidden = false;
+      launcher.setAttribute('aria-expanded', 'true');
+      input && input.focus();
+      ensureGreeting();
+    }
+    function closeChat() {
+      if (!chat || !launcher) return;
+      chat.hidden = true;
+      launcher.setAttribute('aria-expanded', 'false');
+    }
+
+    function ensureGreeting() {
+      if (!messages) return;
+      if (messages.childElementCount === 0) {
+        addAssistantMessage("Hi, I’m here to listen. What’s on your mind today?");
+      }
+    }
+
+    function addMessage(text, role) {
+      if (!messages) return;
+      const wrapper = document.createElement('div');
+      wrapper.className = `message ${role}`;
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.textContent = text;
+      wrapper.appendChild(bubble);
+      messages.appendChild(wrapper);
+      messages.scrollTop = messages.scrollHeight;
+    }
+    function addUserMessage(text) { addMessage(text, 'user'); }
+    function addAssistantMessage(text) { addMessage(text, 'assistant'); }
+
+    function stubResponse(userText) {
+      const prompts = [
+        "I’m listening. Could you tell me a bit more about that?",
+        "That sounds really tough. How long have you been feeling this way?",
+        "Thank you for sharing. What do you feel you need right now?",
+        "If it helps, we can take it one step at a time.",
+      ];
+      const pick = prompts[Math.floor(Math.random() * prompts.length)];
+      return pick;
+    }
+
+    if (launcher) launcher.addEventListener('click', openChat);
+    if (closeBtn) closeBtn.addEventListener('click', closeChat);
+
+    if (form && input) {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const text = input.value.trim();
+        if (!text) return;
+        addUserMessage(text);
+        input.value = '';
+        setTimeout(() => {
+          addAssistantMessage(stubResponse(text));
+        }, 400);
+      });
+    }
+
+    document.querySelectorAll('a[href="#chat"]').forEach(a => {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        openChat();
+      });
+    });
+  })();
+  </script>
+</body>
+</html>
